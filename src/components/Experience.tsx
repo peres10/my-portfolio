@@ -8,6 +8,7 @@ interface ExperienceItem {
     organization: string;
     period: string;
     description: string;
+    logoUrl?: string;
 }
 
 interface ExperienceData {
@@ -32,7 +33,6 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
 
     const handleItemClick = (id: string) => {
         setSelectedId(id);
-
         // small delay to ensure state update and DOM render
         setTimeout(() => {
         }, 100)
@@ -49,14 +49,45 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
     }, []);
 
     const DescriptionPanel = () => {
+        const logoSizeMobile = '100px';
+        const logoSizeDesktop = '240px';
+        const logoPadding = '12px';
+
+        const logoStyle = isDesktop
+            ? {
+                backgroundColor: 'white',
+                width: logoSizeDesktop,
+                height: logoSizeDesktop,
+                padding: logoPadding
+            }
+            : {
+                backgroundColor: 'white',
+                width: logoSizeMobile,
+                height: logoSizeMobile,
+                padding: logoPadding
+            };
+
         return (
             <div className="flex-1 lg:self-start lg:sticky lg:top-24">
                 {selectedItem &&
                     <div
                         ref={detailsRef}
                         className="bg-gradient-to-b from-[rgba(56,56,56,0.56)] to-[rgba(56,56,56,0)] rounded-[24px]
-                                md:rounded-[36px] p-6 md:p-12 min-h-[400px] md:min-h-[500px]"
+                                md:rounded-[36px] p-6 md:p-12 min-h-[400px] md:min-h-[500px] flex flex-col items-center"
                     >
+                        {selectedItem.logoUrl && (
+                            <div
+                                className="rounded-full mb-4 shadow-lg flex items-center justify-center"
+                                style={logoStyle}
+                            >
+                                <img
+                                    src={selectedItem.logoUrl}
+                                    alt={`${selectedItem.organization} Logo`}
+                                    className="w-4/5 h-4/5 object-contain"
+                                />
+                            </div>
+                        )}
+
                         <h3 className="font-poppins-bold italic text-white text-center mb-4 text-xl md:text-2xl">
                             {selectedItem.organization}
                         </h3>
@@ -66,7 +97,10 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
                         <p className="font-poppins-bold italic text-[#00add3] text-center mb-6 md:mb-8 text-base md:text-lg">
                             {selectedItem.period}
                         </p>
-                        <div className="font-poppins text-white leading-relaxed whitespace-pre-wrap text-base md:text-lg">
+                        <div
+                            className="font-poppins text-white leading-relaxed break-words text-base md:text-lg w-full px-4 text-center"
+                            style={{wordBreak: 'break-all'}}
+                        >
                             {selectedItem.description}
                         </div>
                     </div>
@@ -120,35 +154,53 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
         )
     }
 
-    const TextFromBullets = (item: ExperienceItem) => {
+    const TextFromBullets = (item: ExperienceItem, shouldDisplayOrganization: boolean) => {
         return (
             <div className="pl-4">
-                <p className="font-poppins-bold italic text-[#00add3] mb-2 text-base md:text-xl">
-                    {item.period}
-                </p>
+                {/* 1. Moved organization to the top, under the period */}
+                {shouldDisplayOrganization && (
+                    <p className="font-poppins-bold italic text-white/90 mb-1 text-lg md:text-3xl">
+                        {item.organization}
+                    </p>
+                )}
                 <p className="font-poppins-bold text-white mb-1 text-lg md:text-xl">
                     {item.title}
                 </p>
-                <p className="font-poppins-bold italic text-white/90 text-sm md:text-base">
-                    {item.organization}
+                <p className="font-poppins-bold italic text-[#00add3] mb-2 text-base md:text-xl">
+                    {item.period}
                 </p>
+
+
             </div>
         )
     }
 
-    const ItemButton = (item: ExperienceItem, index: number) => {
+    const ItemButton = (item: ExperienceItem, index: number, fullList: ExperienceItem[]) => {
+        const previousItem = fullList[index - 1];
+        const shouldDisplayOrganization = index === 0 || item.organization !== previousItem.organization;
+
+        let spacingClass = "mt-12 md:mt-16";
+        if(index > 0) {
+            if(shouldDisplayOrganization)
+                spacingClass = "mt-12 md:mt-16"
+            else
+                spacingClass = "mt-1 md:mt-2"
+        } else {
+            spacingClass = "mt-0"
+        }
 
         return (
             <button
-                key={index}
+                key={item.id}
                 ref={(el) => { itemRefs.current[item.id] = el; }}
                 onClick={() => handleItemClick(item.id)}
                 className={`relative w-full text-left transition-all duration-300 scale-105
+                    ${spacingClass}
                 `}
             >
-                {HorizontalLine()}
+
                 {Bullet(item)}
-                {TextFromBullets(item)}
+                {TextFromBullets(item, shouldDisplayOrganization)}
             </button>
         )
     }
@@ -173,7 +225,7 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
                             {/* Education Items */}
                             <div className="space-y-12 md:space-y-16">
                                 {educationItems.map((item, index) => (
-                                    ItemButton(item, index)
+                                    ItemButton(item, index, educationItems)
                                 ))}
                             </div>
                         </div>
@@ -190,7 +242,7 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
                                 {/* Work Items */}
                                 <div className="space-y-12 md:space-y-16">
                                     {workItems.map((item, index) => (
-                                        ItemButton(item, index)
+                                        ItemButton(item, index, workItems)
                                     ))}
                                 </div>
                             </div>
