@@ -15,8 +15,6 @@ import {skillsData} from "./data/skills.ts";
 import {experienceData} from "./data/experience.ts";
 import {projectsData} from "./data/projects.ts";
 
-
-
 const App = () => {
     const [activeSection, setActiveSection] = useState("home");
 

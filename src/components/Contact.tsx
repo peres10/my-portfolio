@@ -45,7 +45,7 @@ export const Contact: React.FC<ContactProps> = ({ email, linkedin }) => {
             {/* Inverted Background Image */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <img
-                    src="/src/assets/background/bg_image_bw.jpg"
+                    src="background/bg_image_bw.jpg"
                     alt="Background"
                     className="w-full h-full object-cover opacity-50 transform rotate-180"
                 />

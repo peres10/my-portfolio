@@ -79,7 +79,7 @@ export const Hero: React.FC<HeroProps> = props => {
             {/* image part*/}
             <div className="absolute inset-0 overflow-hidden">
                 <img
-                    src="/src/assets/background/bg_image_bw.jpg"
+                    src="background/bg_image_bw.jpg"
                     alt="Background"
                     className="h-full w-full object-cover"
                 />
