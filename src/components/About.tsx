@@ -1,13 +1,5 @@
-interface AboutData {
-    paragraphs: Array<{
-        text: string;
-        bold: boolean;
-    }>;
-}
-
-interface AboutProps {
-    data: AboutData;
-}
+import type {AboutProps} from "../types/About.ts";
+import * as React from "react";
 
 export const About: React.FC<AboutProps> = ({data}) => {
     return (

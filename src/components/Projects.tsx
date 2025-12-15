@@ -2,32 +2,13 @@ import { useState} from "react";
 // TODO fix github logo later
 // TODO later refactor some code because this is too big
 import { X, ExternalLink, Github, ChevronLeft, ChevronRight } from "lucide-react";
+import type {Project, ProjectsProps} from "../types/Projects.ts";
+import * as React from "react";
 
+// TODO this should be also in the data
 const ENABLE_CAROUSEL = true; // enables the featured projects
 const FEATURED_PROJECT_IDS = ["ecommerce-platform", "task-manager"];
 const PROJECTS_PER_PAGE = 6;
-
-interface Project {
-    id: string;
-    title: string;
-    shortDescription: string;
-    fullDescription: string;
-    technologies: string[];
-    images?: string[]; // Optional array of image URLs
-    links: {
-        github?: string;
-        demo?: string;
-    };
-    featured?: boolean;
-}
-
-interface ProjectsData {
-    projects: Project[];
-}
-
-interface ProjectsProps {
-    data: ProjectsData;
-}
 
 export const Projects: React.FC<ProjectsProps> = ( { data }) => {
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);

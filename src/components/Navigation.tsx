@@ -4,10 +4,7 @@ import {Menu, X} from "lucide-react";
 import {navItems} from "../data/nav_items.ts";
 
 import * as React from "react";
-
-interface NavigationProps {
-    activeSection: string;
-}
+import type {MobileNavigationTypeProps, NavigationProps, NavigationTypeProps, NavigationItem} from "../types/Navigation.ts";
 
 export const Navigation: React.FC<NavigationProps> = ({activeSection}) => {
     const [isHovered, setHovered] = useState(false);
@@ -66,24 +63,25 @@ export const Navigation: React.FC<NavigationProps> = ({activeSection}) => {
     )
 }
 
-interface NavigationTypeProps {
-    activeSection: string;
-    scrollToSection: (sectionId: string) => void;
-}
-
 const DesktopNavigation: React.FC<NavigationTypeProps> = ({activeSection, scrollToSection}) => {
+    const SectionButton = (item: NavigationItem) => {
+        return (
+                <button
+                    onClick={() => scrollToSection(item.id)}
+                    className={`font-poppins-semi-bold text-white transition-all duration-300 hover:text-[#00add3] text-base lg:text-lg cursor-pointer
+                                    ${activeSection === item.id ? "text-[#00add3]" : ""}`}
+                >
+                    {item.label}
+                </button>
+        )
+    }
+
     return (
         <>
             <ul className="hidden md:flex justify-center gap-8 lg:gap-12">
                 {navItems.map((item) => (
                     <li key={item.id}>
-                        <button
-                            onClick={() => scrollToSection(item.id)}
-                            className={`font-poppins-semi-bold text-white transition-all duration-300 hover:text-[#00add3] text-base lg:text-lg cursor-pointer
-                                    ${activeSection === item.id ? "text-[#00add3]" : ""}`}
-                        >
-                            {item.label}
-                        </button>
+                        {SectionButton(item)}
                     </li>
                 ))}
             </ul>
@@ -91,18 +89,25 @@ const DesktopNavigation: React.FC<NavigationTypeProps> = ({activeSection, scroll
     )
 }
 
-interface MobileNavigationTypeProps extends NavigationTypeProps {
-    isMobileMenuOpen: boolean;
-    setIsMobileMenuOpen: (isMobileMenuOpen: boolean) => void;
-}
-
-
 const MobileNavigation: React.FC<MobileNavigationTypeProps> = ({
                                                                    activeSection,
                                                                    scrollToSection,
                                                                    isMobileMenuOpen,
                                                                    setIsMobileMenuOpen
                                                                }) => {
+    const SectionButton = (item: NavigationItem) => {
+        return (
+            <button
+                onClick={() => scrollToSection(item.id)}
+                className={`w-full text-left px-6 py-4 font-poppins-semi-bold text-white transition-all duration-300 hover:bg-white/10 hover:text-[#00add3] text-lg ${
+                    activeSection === item.id ? "text-[#00add3] bg-white/5" : ""
+                }`}
+            >
+                {item.label}
+            </button>
+        )
+    }
+
     return (
         <div className="md:hidden">
             <button
@@ -119,14 +124,7 @@ const MobileNavigation: React.FC<MobileNavigationTypeProps> = ({
                     <ul className="flex flex-col py-4">
                         {navItems.map((item) => (
                             <li key={item.id}>
-                                <button
-                                    onClick={() => scrollToSection(item.id)}
-                                    className={`w-full text-left px-6 py-4 font-poppins-semi-bold text-white transition-all duration-300 hover:bg-white/10 hover:text-[#00add3] text-lg ${
-                                        activeSection === item.id ? "text-[#00add3] bg-white/5" : ""
-                                    }`}
-                                >
-                                    {item.label}
-                                </button>
+                                {SectionButton(item)}
                             </li>
                         ))}
                     </ul>

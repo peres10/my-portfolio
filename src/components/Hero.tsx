@@ -1,12 +1,6 @@
 import { Linkedin, Github} from "lucide-react";
-
-interface HeroProps {
-    name: string,
-    titles: string[];
-    cvPath?: string;
-    linkedin: string;
-    github: string;
-}
+import * as React from "react";
+import type {HeroProps} from "../types/Hero.ts";
 
 export const Hero: React.FC<HeroProps> = props => {
     const handleViewCV = (e: React.MouseEvent<HTMLButtonElement>) => {

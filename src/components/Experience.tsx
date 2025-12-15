@@ -1,27 +1,11 @@
 import {useState, useRef, useEffect} from "react";
 import * as React from "react";
+import type {ExperienceItem, ExperienceProps} from "../types/Experience.ts";
 
-interface ExperienceItem {
-    id: string;
-    type: "work" | "education";
-    title: string;
-    organization: string;
-    period: string;
-    description: string;
-    logoUrl?: string;
-}
 
-interface ExperienceData {
-    items: ExperienceItem[];
-}
-
-interface ExperienceProps {
-    data: ExperienceData;
-}
 
 export const Experience: React.FC<ExperienceProps> = ({ data }) => {
-    // TODO The selected on by default should be defined in that experience data file, and should be or the current job or the masters degree
-    const [selectedId, setSelectedId] = useState<string | null>(data.items[0]?.id || null);
+    const [selectedId, setSelectedId] = useState<string | null>(data.defaultSelectedId || null);
     const [isDesktop, setIsDesktop] = useState(false);
 
     const detailsRef = useRef<HTMLDivElement>(null);
@@ -98,7 +82,7 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
                             {selectedItem.period}
                         </p>
                         <div
-                            className="font-poppins text-white leading-relaxed break-words text-base md:text-lg w-full px-4 text-center"
+                            className="font-poppins text-white leading-relaxed break-words text-base md:text-lg w-full px-4 text-left whitespace-pre-wrap"
                             style={{wordBreak: 'break-all'}}
                         >
                             {selectedItem.description}
@@ -112,15 +96,6 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
     const VerticalLine = () => {
         return (
             <div className="absolute left-[18px] md:left-[30px] top-0 bottom-0 w-[7px] bg-[#00ADD3] rounded-full" />)
-    }
-
-    const HorizontalLine = () => {
-        return (
-            <div
-                className="absolute left-[-36px] md:left-[-66px] top-[18px] md:top-[20px] w-[50px] md:w-[45px] h-[4px] bg-[#00ADD3] rounded-full -z-10"
-                style={{ top: isDesktop ? '42.5px' : '38px' }}
-            />
-        )
     }
 
     const Bullet = (item: ExperienceItem) => {
@@ -144,8 +119,8 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
                         cx="22.5"
                         cy="22.5"
                         r="19"
-                        fill={selectedId === item.id ? "#00ADD3" : "rgba(255,255,255,1)"}
-                        stroke="#00ADD3"
+                        fill={selectedId === item.id ? "#00d1ff" : "rgba(255,255,255,1)"}
+                        stroke={selectedId === item.id ? "#00d1ff" : "#00ADD3"}
                         strokeWidth="7"
                         className="transition-all duration-500 ease-in-out"
                     />
@@ -215,25 +190,9 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
             <div className="w-full max-w-[1400px] flex flex-col lg:flex-row gap-12 lg:gap-24">
                 {/* timeline */}
                 <div className="flex-1">
-                    {/* education section */}
-                    <div className="mb-16 md:mb-24">
-                        <h3 className="font-['Poppins:Bold',sans-serif] text-white mb-8 md:mb-12 text-2xl md:text-3xl pl-0 md:pl-4">
-                            Education
-                        </h3>
-                        <div className="relative pl-12 md:pl-20">
-                            {VerticalLine()}
-                            {/* Education Items */}
-                            <div className="space-y-12 md:space-y-16">
-                                {educationItems.map((item, index) => (
-                                    ItemButton(item, index, educationItems)
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
                     {/* work section */}
                     { workItems.length > 0 && (
-                        <div>
+                        <div className="mb-16 md:mb-24">
                             <h3 className="font-poppins-bold text-white mb-8 md:mb-12 text-2xl md:text-3xl pl-0 md:pl-4">
                                 Work
                             </h3>
@@ -248,6 +207,22 @@ export const Experience: React.FC<ExperienceProps> = ({ data }) => {
                             </div>
                         </div>
                     )}
+                    {/* education section */}
+                    <div className="mb-16 md:mb-24">
+                        <h3 className="font-poppins-bold text-white mb-8 md:mb-12 text-2xl md:text-3xl pl-0 md:pl-4">
+                            Education
+                        </h3>
+                        <div className="relative pl-12 md:pl-20">
+                            {VerticalLine()}
+                            {/* Education Items */}
+                            <div className="space-y-12 md:space-y-16">
+                                {educationItems.map((item, index) => (
+                                    ItemButton(item, index, educationItems)
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
 
                     <p className="font-poppins italic text-white/70 text-xs md:text-sm mt-8 pl-0 md:pl-4">
                         Click on a bullet point to show more information

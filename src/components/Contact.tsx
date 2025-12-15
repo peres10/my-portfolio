@@ -1,36 +1,56 @@
-import { useState} from "react";
+import {useState, useRef} from "react";
+import emailjs from "@emailjs/browser";
 import { Mail, Linkedin, Send} from "lucide-react";
-
-interface ContactProps {
-    email: string;
-    linkedin: string;
-}
+import type {ContactProps} from "../types/Contact.ts";
+import * as React from "react";
 
 export const Contact: React.FC<ContactProps> = ({ email, linkedin }) => {
+    const form = useRef<HTMLFormElement>(null);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         message: "",
-    })
-    //const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    // TODO hardcoded for now while having that deactivate
-    const isSubmitting = true
+    });
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [statusMessage, setStatusMessage] = useState<string>("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        //setIsSubmitting(true);
+        setIsSubmitting(true);
+        setStatusMessage("Sending...");
 
-        // Simulate submission
-        // TODO make this real mail
-        //await new Promise((resolve) => setTimeout(resolve, 1000));
+        const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+        const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+        const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
-        // In a real application, you would send this to an API endpoint
-        //console.log("Form submitted:", formData);
+        console.log(serviceId)
+        console.log(templateId)
+        console.log(publicKey)
 
-        //toast.success("Message sent successfully! I'll get back to you soon.");
+        if (!serviceId || !templateId || !publicKey) {
+            setStatusMessage("Error: EmailJS credentials are not set.");
+            setIsSubmitting(false);
+            return;
+        }
 
-        //setFormData({ name: "", email: "", message: "" });
-        //setIsSubmitting(false);
+        if (!form.current) {
+            setStatusMessage("Error: Form reference is not available.");
+            setIsSubmitting(false);
+            return;
+        }
+
+        emailjs.sendForm(serviceId, templateId, form.current, publicKey)
+            .then(() => {
+                setStatusMessage("Message sent successfully!");
+                setFormData({ name: "", email: "", message: "" });
+            }, (error) => {
+                console.error("EmailJS error:", error);
+                setStatusMessage("Failed to send message. Please try again later.");
+            })
+            .finally(() => {
+                setIsSubmitting(false);
+                setTimeout(() => setStatusMessage(""), 5000); // Clear message after 5 seconds
+            });
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -101,21 +121,8 @@ export const Contact: React.FC<ContactProps> = ({ email, linkedin }) => {
                 </div>
 
                 {/* Contact Form */}
-                <div className="relative bg-gradient-to-b from-[rgba(56,56,56,0.56)] to-[rgba(56,56,56,0)] blur-lg rounded-[24px] p-6 md:p-8">
-                    {/* Overlay to block interaction and show status */}
-                    <div className="absolute inset-0 bg-[rgba(56,56,56,0.6)] rounded-[24px] z-20 flex items-center justify-center p-8 pointer-events-auto">
-                        <div className="text-center">
-                            <Send className="w-10 h-10 mx-auto mb-4 text-[#00add3]" />
-                            <p className="font-poppins-semi-bold text-white text-xl md:text-2xl mb-2">
-                                Form Temporarily Offline 🛠️
-                            </p>
-                            <p className="font-poppins text-white/80 text-base md:text-lg">
-                                I'm upgrading the mailing system! Please use the **Email** or **LinkedIn** links to contact me directly in the meantime.
-                            </p>
-                        </div>
-                    </div> {/* <--- Added Overlay */}
-
-                    <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6 opacity-50 pointer-events-none" aria-disabled="true">
+                <div className="relative bg-gradient-to-b from-[rgba(56,56,56,0.56)] to-[rgba(56,56,56,0)] rounded-[24px] p-6 md:p-8">
+                    <form ref={form} onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                         <div>
                             <label
                                 htmlFor="name"
@@ -187,6 +194,9 @@ export const Contact: React.FC<ContactProps> = ({ email, linkedin }) => {
                                 </>
                             )}
                         </button>
+                        {statusMessage && (
+                            <p className="text-center font-poppins text-white mt-4">{statusMessage}</p>
+                        )}
                     </form>
                 </div>
             </div>
